@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>জেনারেল স্টোর ব্যবস্থাপনা</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Tiro+Bangla&family=Noto+Sans+Bengali:wght@400;500;600;700&family=Noto+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="./style.css">
+</head>
+<body>
+
+<!-- ===================== APP SHELL ===================== -->
+<div class="app-shell">
+
+  <!-- ---------- SIDEBAR ---------- -->
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <img src="./assets/logo.png" alt="" class="brand-logo" id="brandLogo" onerror="this.style.display='none'">
+      <div class="brand-text">
+        <span class="brand-title" id="brandOfficeName">জেনারেল স্টোর</span>
+        <span class="brand-sub">ইনভেন্টরি ব্যবস্থাপনা</span>
+      </div>
+    </div>
+
+    <nav class="nav-menu" id="navMenu">
+      <button class="nav-item active" data-view="dashboard">
+        <span class="nav-ic">◧</span><span class="nav-label">ড্যাশবোর্ড</span>
+      </button>
+      <button class="nav-item" data-view="products">
+        <span class="nav-ic">▤</span><span class="nav-label">মালামালের তালিকা</span>
+      </button>
+      <button class="nav-item" data-view="stockin">
+        <span class="nav-ic">↓</span><span class="nav-label">মালামাল ক্রয় / Stock In</span>
+      </button>
+      <button class="nav-item" data-view="stockout">
+        <span class="nav-ic">↑</span><span class="nav-label">দপ্তরে মালামাল প্রদান</span>
+      </button>
+      <button class="nav-item" data-view="departments">
+        <span class="nav-ic">▣</span><span class="nav-label">দপ্তরসমূহ</span>
+      </button>
+      <button class="nav-item" data-view="transactions">
+        <span class="nav-ic">≡</span><span class="nav-label">লেনদেনের ইতিহাস</span>
+      </button>
+      <button class="nav-item" data-view="reports">
+        <span class="nav-ic">▦</span><span class="nav-label">রিপোর্ট</span>
+      </button>
+      <button class="nav-item" data-view="monthly">
+        <span class="nav-ic">▥</span><span class="nav-label">মাসিক হিসাব</span>
+      </button>
+      <button class="nav-item" data-view="archive">
+        <span class="nav-ic">▢</span><span class="nav-label">আর্কাইভ</span>
+      </button>
+      <button class="nav-item" data-view="settings">
+        <span class="nav-ic">⚙</span><span class="nav-label">সেটিংস</span>
+      </button>
+    </nav>
+
+    <div class="sidebar-foot">
+      <button class="lang-toggle" id="langToggle">English</button>
+    </div>
+  </aside>
+
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+  <!-- ---------- MAIN ---------- -->
+  <div class="main-col">
+
+    <header class="topbar">
+      <button class="hamburger" id="hamburgerBtn" aria-label="মেনু">☰</button>
+      <h1 class="topbar-title" id="viewTitle">ড্যাশবোর্ড</h1>
+      <div class="topbar-search">
+        <input type="text" id="globalSearch" placeholder="মালামাল, দপ্তর, গ্রহণকারী বা লেনদেন খুঁজুন...">
+        <div class="search-results" id="searchResults"></div>
+      </div>
+    </header>
+
+    <main class="content" id="content">
+
+      <!-- ===================== DASHBOARD ===================== -->
+      <section class="view" id="view-dashboard">
+        <div class="cards-grid" id="dashCards"></div>
+
+        <div class="dash-grid">
+          <div class="panel">
+            <div class="panel-head">
+              <h2>সাম্প্রতিক কার্যক্রম</h2>
+            </div>
+            <div class="panel-body" id="recentActivity"></div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-head">
+              <h2>স্টক সতর্কতা</h2>
+            </div>
+            <div class="panel-body" id="stockAlerts"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===================== PRODUCTS ===================== -->
+      <section class="view hidden" id="view-products">
+        <div class="toolbar">
+          <div class="toolbar-filters">
+            <select id="prodCategoryFilter"><option value="">সকল ক্যাটাগরি</option></select>
+            <select id="prodStockFilter">
+              <option value="">সকল স্টক অবস্থা</option>
+              <option value="low">লো স্টক</option>
+              <option value="out">স্টক শেষ</option>
+            </select>
+            <input type="text" id="prodSearchBox" placeholder="নাম বা আইডি দিয়ে খুঁজুন">
+          </div>
+          <div class="toolbar-actions">
+            <button class="btn btn-ghost" id="manageCategoriesBtn">ক্যাটাগরি ব্যবস্থাপনা</button>
+            <button class="btn btn-primary" id="addProductBtn">+ নতুন মালামাল</button>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table class="data-table" id="productsTable">
+            <thead>
+              <tr>
+                <th>আইডি</th><th>নাম</th><th>ক্যাটাগরি</th><th>ব্র্যান্ড</th><th>একক</th>
+                <th>বর্তমান স্টক</th><th>নূন্যতম স্টক</th><th>যোগের তারিখ</th><th>অ্যাকশন</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+          <p class="empty-state" id="productsEmpty" hidden>কোনো মালামাল পাওয়া যায়নি। নতুন মালামাল যোগ করুন।</p>
+        </div>
+      </section>
+
+      <!-- ===================== STOCK IN ===================== -->
+      <section class="view hidden" id="view-stockin">
+        <div class="split-layout">
+          <div class="panel form-panel">
+            <div class="panel-head"><h2>মালামাল ক্রয় এন্ট্রি</h2></div>
+            <form id="stockInForm" class="app-form">
+              <input type="hidden" id="stockInEditId">
+              <div class="form-row">
+                <label>তারিখ <span class="req">*</span></label>
+                <input type="date" id="stockInDate" required>
+              </div>
+              <div class="form-row">
+                <label>মালামাল <span class="req">*</span></label>
+                <select id="stockInProduct" required></select>
+              </div>
+              <div class="form-row">
+                <label>পরিমাণ <span class="req">*</span></label>
+                <input type="number" id="stockInQty" min="0.01" step="any" required>
+                <span class="input-suffix" id="stockInUnitLabel"></span>
+              </div>
+              <div class="form-row">
+                <label>চালান/ক্রয় নং</label>
+                <input type="text" id="stockInChallan" placeholder="ঐচ্ছিক">
+              </div>
+              <div class="form-row">
+                <label>মন্তব্য</label>
+                <textarea id="stockInNote" rows="2" placeholder="ঐচ্ছিক"></textarea>
+              </div>
+              <div class="form-actions">
+                <button type="button" class="btn btn-ghost" id="stockInCancelBtn" hidden>বাতিল</button>
+                <button type="submit" class="btn btn-primary">স্টক ইন সংরক্ষণ করুন</button>
+              </div>
+            </form>
+          </div>
+
+          <div class="panel">
+            <div class="panel-head">
+              <h2>স্টক ইন হিস্ট্রি</h2>
+            </div>
+            <div class="toolbar toolbar-compact">
+              <input type="month" id="stockInMonthFilter">
+              <select id="stockInProductFilter"><option value="">সকল মালামাল</option></select>
+            </div>
+            <div class="table-wrap">
+              <table class="data-table" id="stockInTable">
+                <thead>
+                  <tr><th>তারিখ</th><th>ট্রান্স আইডি</th><th>মালামাল</th><th>পরিমাণ</th><th>চালান নং</th><th>মন্তব্য</th><th>অ্যাকশন</th></tr>
+                </thead>
+                <tbody></tbody>
+              </table>
+              <p class="empty-state" id="stockInEmpty" hidden>কোনো স্টক ইন রেকর্ড নেই।</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===================== STOCK OUT ===================== -->
+      <section class="view hidden" id="view-stockout">
+        <div class="split-layout">
+          <div class="panel form-panel">
+            <div class="panel-head"><h2>দপ্তরে মালামাল প্রদান এন্ট্রি</h2></div>
+            <form id="stockOutForm" class="app-form">
+              <input type="hidden" id="stockOutEditId">
+              <div class="form-row">
+                <label>তারিখ <span class="req">*</span></label>
+                <input type="date" id="stockOutDate" required>
+              </div>
+              <div class="form-row">
+                <label>দপ্তর <span class="req">*</span></label>
+                <select id="stockOutDept" required></select>
+              </div>
+              <div class="form-row">
+                <label>মালামাল <span class="req">*</span></label>
+                <select id="stockOutProduct" required></select>
+                <span class="stock-hint" id="stockOutAvailHint"></span>
+              </div>
+              <div class="form-row">
+                <label>পরিমাণ <span class="req">*</span></label>
+                <input type="number" id="stockOutQty" min="0.01" step="any" required>
+                <span class="input-suffix" id="stockOutUnitLabel"></span>
+              </div>
+              <div class="form-row">
+                <label>গ্রহণকারীর নাম <span class="req">*</span></label>
+                <input type="text" id="stockOutReceiver" required placeholder="যেমনঃ মোঃ করিম">
+              </div>
+              <div class="form-row">
+                <label>মন্তব্য</label>
+                <textarea id="stockOutNote" rows="2" placeholder="ঐচ্ছিক"></textarea>
+              </div>
+              <p class="form-error" id="stockOutError" hidden></p>
+              <div class="form-actions">
+                <button type="button" class="btn btn-ghost" id="stockOutCancelBtn" hidden>বাতিল</button>
+                <button type="submit" class="btn btn-primary">বিতরণ নিশ্চিত করুন</button>
+              </div>
+            </form>
+          </div>
+
+          <div class="panel">
+            <div class="panel-head"><h2>বিতরণ হিস্ট্রি</h2></div>
+            <div class="toolbar toolbar-compact">
+              <input type="month" id="stockOutMonthFilter">
+              <select id="stockOutDeptFilter"><option value="">সকল দপ্তর</option></select>
+            </div>
+            <div class="table-wrap">
+              <table class="data-table" id="stockOutTable">
+                <thead>
+                  <tr><th>তারিখ</th><th>দপ্তর</th><th>মালামাল</th><th>পরিমাণ</th><th>গ্রহণকারী</th><th>মন্তব্য</th><th>অ্যাকশন</th></tr>
+                </thead>
+                <tbody></tbody>
+              </table>
+              <p class="empty-state" id="stockOutEmpty" hidden>কোনো বিতরণ রেকর্ড নেই।</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===================== DEPARTMENTS ===================== -->
+      <section class="view hidden" id="view-departments">
+        <div class="toolbar">
+          <input type="text" id="deptSearchBox" placeholder="দপ্তরের নাম দিয়ে খুঁজুন">
+          <button class="btn btn-primary" id="addDeptBtn">+ নতুন দপ্তর</button>
+        </div>
+        <div class="table-wrap">
+          <table class="data-table" id="deptTable">
+            <thead>
+              <tr><th>আইডি</th><th>দপ্তরের নাম</th><th>দায়িত্বপ্রাপ্ত ব্যক্তি</th><th>অবস্থা</th><th>যোগের তারিখ</th><th>অ্যাকশন</th></tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+          <p class="empty-state" id="deptEmpty" hidden>কোনো দপ্তর যোগ করা হয়নি।</p>
+        </div>
+      </section>
+
+      <!-- ===================== TRANSACTIONS ===================== -->
+      <section class="view hidden" id="view-transactions">
+        <div class="toolbar">
+          <div class="toolbar-filters">
+            <select id="txnTypeFilter">
+              <option value="">সকল ধরন</option>
+              <option value="opening">Opening Stock</option>
+              <option value="in">Stock In</option>
+              <option value="out">Stock Out</option>
+            </select>
+            <input type="date" id="txnFromDate">
+            <input type="date" id="txnToDate">
+            <select id="txnProductFilter"><option value="">সকল মালামাল</option></select>
+            <select id="txnDeptFilter"><option value="">সকল দপ্তর</option></select>
+          </div>
+          <div class="toolbar-actions">
+            <button class="btn btn-ghost" id="txnExportBtn">CSV এক্সপোর্ট</button>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table class="data-table" id="txnTable">
+            <thead>
+              <tr><th>ট্রান্স আইডি</th><th>তারিখ</th><th>ধরন</th><th>মালামাল</th><th>দপ্তর</th><th>পরিমাণ</th><th>গ্রহণকারী</th><th>মন্তব্য</th></tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+          <p class="empty-state" id="txnEmpty" hidden>কোনো লেনদেন পাওয়া যায়নি।</p>
+        </div>
+      </section>
+
+      <!-- ===================== REPORTS ===================== -->
+      <section class="view hidden" id="view-reports">
+        <div class="report-tabs">
+          <button class="report-tab active" data-report="department">দপ্তর রিপোর্ট</button>
+          <button class="report-tab" data-report="product">মালামাল-ভিত্তিক রিপোর্ট (লেজার)</button>
+          <button class="report-tab" data-report="stock">বর্তমান স্টক রিপোর্ট</button>
+        </div>
+
+        <!-- Department report -->
+        <div class="report-pane" id="report-department">
+          <div class="toolbar toolbar-compact">
+            <select id="repDeptSelect"><option value="">দপ্তর নির্বাচন করুন</option></select>
+            <input type="date" id="repDeptFrom">
+            <input type="date" id="repDeptTo">
+            <select id="repDeptProduct"><option value="">সকল মালামাল</option></select>
+            <button class="btn btn-primary" id="repDeptGenerate">রিপোর্ট তৈরি করুন</button>
+          </div>
+          <div id="repDeptOutput" class="report-output"></div>
+        </div>
+
+        <!-- Product ledger report -->
+        <div class="report-pane hidden" id="report-product">
+          <div class="toolbar toolbar-compact">
+            <select id="repProdSelect"><option value="">মালামাল নির্বাচন করুন</option></select>
+            <button class="btn btn-primary" id="repProdGenerate">রিপোর্ট তৈরি করুন</button>
+          </div>
+          <div id="repProdOutput" class="report-output"></div>
+        </div>
+
+        <!-- Stock report -->
+        <div class="report-pane hidden" id="report-stock">
+          <div class="toolbar toolbar-compact">
+            <select id="repStockCategory"><option value="">সকল ক্যাটাগরি</option></select>
+            <button class="btn btn-ghost" id="repStockExport">CSV এক্সপোর্ট</button>
+            <button class="btn btn-primary printable-trigger" data-target="repStockOutput">🖨 প্রিন্ট রিপোর্ট</button>
+          </div>
+          <div id="repStockOutput" class="report-output"></div>
+        </div>
+      </section>
+
+      <!-- ===================== MONTHLY ===================== -->
+      <section class="view hidden" id="view-monthly">
+        <div class="toolbar toolbar-compact">
+          <input type="month" id="monthlySelect">
+          <button class="btn btn-primary" id="monthlyGenerate">সামারি দেখুন</button>
+          <button class="btn btn-ghost printable-trigger" data-target="monthlyOutput">🖨 প্রিন্ট রিপোর্ট</button>
+        </div>
+        <div id="monthlyOutput" class="report-output"></div>
+      </section>
+
+      <!-- ===================== ARCHIVE ===================== -->
+      <section class="view hidden" id="view-archive">
+        <div class="report-tabs">
+          <button class="report-tab active" data-archive="products">আর্কাইভকৃত মালামাল</button>
+          <button class="report-tab" data-archive="departments">আর্কাইভকৃত দপ্তর</button>
+        </div>
+        <div class="archive-pane" id="archive-products">
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead><tr><th>আইডি</th><th>নাম</th><th>ক্যাটাগরি</th><th>স্টক</th><th>অ্যাকশন</th></tr></thead>
+              <tbody id="archiveProductsBody"></tbody>
+            </table>
+            <p class="empty-state" id="archiveProductsEmpty" hidden>আর্কাইভে কোনো মালামাল নেই।</p>
+          </div>
+        </div>
+        <div class="archive-pane hidden" id="archive-departments">
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead><tr><th>আইডি</th><th>দপ্তরের নাম</th><th>দায়িত্বপ্রাপ্ত</th><th>অ্যাকশন</th></tr></thead>
+              <tbody id="archiveDeptBody"></tbody>
+            </table>
+            <p class="empty-state" id="archiveDeptEmpty" hidden>আর্কাইভে কোনো দপ্তর নেই।</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===================== SETTINGS ===================== -->
+      <section class="view hidden" id="view-settings">
+        <div class="settings-grid">
+          <div class="panel">
+            <div class="panel-head"><h2>অফিস তথ্য</h2></div>
+            <form class="app-form" id="settingsForm">
+              <div class="form-row">
+                <label>অফিসের নাম</label>
+                <input type="text" id="setOfficeName">
+              </div>
+              <div class="form-row">
+                <label>ঠিকানা</label>
+                <textarea id="setOfficeAddress" rows="2"></textarea>
+              </div>
+              <div class="form-row">
+                <label>লোগো URL (assets/logo.png)</label>
+                <input type="text" id="setOfficeLogo" placeholder="./assets/logo.png">
+              </div>
+              <div class="form-row">
+                <label>ফোন</label>
+                <input type="text" id="setOfficePhone">
+              </div>
+              <div class="form-row">
+                <label>ইমেইল</label>
+                <input type="email" id="setOfficeEmail">
+              </div>
+              <div class="form-row">
+                <label>ডিফল্ট নূন্যতম স্টক</label>
+                <input type="number" id="setDefaultMinStock" min="0">
+              </div>
+              <div class="form-row">
+                <label>থিম</label>
+                <select id="setTheme">
+                  <option value="light">উজ্জ্বল (Light)</option>
+                  <option value="dark">গাঢ় (Dark)</option>
+                </select>
+              </div>
+              <div class="form-actions">
+                <button type="submit" class="btn btn-primary">সংরক্ষণ করুন</button>
+              </div>
+            </form>
+          </div>
+
+          <div class="panel">
+            <div class="panel-head"><h2>ব্যাকআপ ও রিস্টোর</h2></div>
+            <div class="panel-body">
+              <p class="hint-text">সব তথ্য (মালামাল, দপ্তর, লেনদেন, সেটিংস) একটি JSON ফাইলে ডাউনলোড করুন অথবা পূর্বের ব্যাকআপ থেকে পুনরুদ্ধার করুন।</p>
+              <div class="form-actions">
+                <button class="btn btn-primary" id="backupBtn">ব্যাকআপ ডাউনলোড করুন</button>
+                <button class="btn btn-ghost" id="restoreBtn">রিস্টোর করুন</button>
+                <input type="file" id="restoreFileInput" accept="application/json" hidden>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+</div>
+
+<!-- ===================== GENERIC MODAL ===================== -->
+<div class="modal-overlay hidden" id="modalOverlay">
+  <div class="modal-box" id="modalBox"></div>
+</div>
+
+<!-- ===================== CONFIRM DIALOG ===================== -->
+<div class="modal-overlay hidden" id="confirmOverlay">
+  <div class="modal-box confirm-box">
+    <p id="confirmMessage"></p>
+    <div class="form-actions">
+      <button class="btn btn-ghost" id="confirmCancelBtn">না</button>
+      <button class="btn btn-danger" id="confirmOkBtn">হ্যাঁ, নিশ্চিত</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== TOAST ===================== -->
+<div class="toast-stack" id="toastStack"></div>
+
+<!-- ===================== PRINT AREA ===================== -->
+<div id="printArea" class="print-area"></div>
+
+<script src="./script.js"></script>
+</body>
+</html>
